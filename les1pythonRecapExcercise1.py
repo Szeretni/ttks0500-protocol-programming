@@ -8,7 +8,6 @@ class Calc:
         self.printRes(op,res)
 
     def args(self):
-        arg = 0
         try:
             arg = float(raw_input("enter a number: "))
         except ValueError:
