@@ -10,10 +10,7 @@ class Student:
             self.students.append(raw_input("enter new student's name: "))
         elif operation == "delete":
             while(True):
-                ind = 0
-                for s in self.students:
-                    print ind,s
-                    ind += 1
+                self.listStudents()
                 selection = int(raw_input("delete student #: "))
                 try:
                     self.students.pop(selection)
@@ -21,10 +18,7 @@ class Student:
                 except IndexError:
                     print "invalid index, try again"
         elif operation == "edit":
-            ind = 0
-            for s in self.students:
-                print ind,s
-                ind += 1
+            self.listStudents()
             selection = int(raw_input("edit student #: "))
             newName = raw_input("new name of the student: ")
             try:
@@ -35,6 +29,12 @@ class Student:
         elif operation == "print":
             for s in self.students:
                 print s
+
+    def listStudents(self):
+        ind = 0
+        for s in self.students:
+            print ind,s
+            ind += 1
 
     students = []
 
