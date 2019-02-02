@@ -22,7 +22,7 @@ def main():
 
 		kuva = open(sijainti+filename,"wb")
 
-		data = client.recv(2024)
+		data = client.recv(1024)
 
 		while data:
 			kuva.write(data)
