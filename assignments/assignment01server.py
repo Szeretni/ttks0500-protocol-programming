@@ -1,10 +1,10 @@
 ''' output
-new connection: ('127.0.0.1', 50027)
-bytes received: 1024
-bytes received: 2048
-bytes received: 3072
-bytes received: 4096
-bytes received: 5000
+new connection: ('127.0.0.1', 50122)
+bytes received from client: 1024
+bytes received from client: 2048
+bytes received from client: 3072
+bytes received from client: 4096
+bytes received from client: 5000
 closing connection
 all 5000 bytes received - exiting
 '''
@@ -26,7 +26,7 @@ def server():
             break
         data += msg
         bytesReceived = len(data)
-        print "bytes received:",bytesReceived
+        print "bytes received from client:",bytesReceived
         client.send(str(bytesReceived)+"\n")
     client.close()
     s.close()

@@ -16,8 +16,12 @@ Compare something until 2 values match with each other
 '''
 ''' output
 size of outgoing data: 5000
-clien has sent 5000 bytes
-server has received 5000 bytes
+client has sent 5000 bytes
+server has received 1024 bytes
+server has received 2048 bytes
+server has received 3072 bytes
+server has received 4096 bytes
+server has received all 5000 bytes
 closing connection
 '''
 
@@ -32,16 +36,17 @@ def sendData(socket,data):
         sentData = 0
         while sentData < sizeOfData:
             sentData += socket.send(data[sentData:]) # returns the number of bytes sent
-            print "clien has sent %d bytes" % sentData
+            print "client has sent %d bytes" % sentData
         msg = ""
         while True:
             msg += socket.recv(1)
             while not "\n" in msg:
                 msg += socket.recv(1)
             if int(msg) == sentData:
-                print "server has received %s bytes" % msg.strip()
+                print "server has received all %s bytes" % msg.strip()
                 socket.send("closeConn")
                 break
+            print "server has received %s bytes" % msg.strip()
             msg = ""
         socket.close()
         print "closing connection"
