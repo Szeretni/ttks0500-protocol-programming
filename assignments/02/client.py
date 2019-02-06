@@ -4,10 +4,13 @@ This means two things: Make sure everything gets sent and received. Figure out a
 '''
 
 import socket
-import assignment02functions as f
+import functions as f
 
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 s.connect(("localhost",8888))
-s.send(f.writeMsg())
-print s.recv(1024)
+f.sendMsg(s)
 s.close()
+
+''' output
+sent 11000 of 11000 bytes
+'''
