@@ -1,0 +1,20 @@
+Make the following modifications to the server example:
+
+    Add two command line parameters to the program:
+        address
+        port
+    If these two values are not given from the command line the server should print an error message and exit immediately
+    These two values should be used for binding the server socket with bind()
+    Keep the server running after a single connection has been handled.
+        You don’t have to be able to handle multiple connections at the same time!
+        Once a connection has been handled the server should go back to waiting new connection (accept()-method)
+
+Make the following modifications to the client program:
+
+    Add two command line parameters to the program:
+        address
+        port
+    If these two values are not given from the command line the client should print an error message and exit immediately
+    Handle the exceptions from connect() and send() and print a human readable error message if an error occurs
+        e.g. “cannot connect to server” or “sending data to the server failed”
+
