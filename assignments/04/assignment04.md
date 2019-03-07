@@ -21,7 +21,7 @@ The user uses an command line interface (CLI) to use this protocol (she uses key
 
 ## Requests
 
-Request format: method sp address sp port sp  \r\n
+Request format: method sp address sp port sp option \r\n
 
 Example: DOWNLOAD localhost 8888 cat.jpg
 
