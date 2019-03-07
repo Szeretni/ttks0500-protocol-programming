@@ -1,4 +1,4 @@
-# Protocol programming - assignment 04 - Hannu Oksman L2912
+# Protocol Programming - Assignment 04 - Hannu Oksman L2912
 
 # HannuProtocol
 
@@ -21,7 +21,7 @@ The user uses an command line interface (CLI) to use this protocol (she uses key
 
 ## Requests
 
-Request format: method sp address sp port sp option \r\n
+Request format: method sp address sp port sp  \r\n
 
 Example: DOWNLOAD localhost 8888 cat.jpg
 
@@ -29,11 +29,11 @@ Syntax:
 * Method (mandatory): name of the method ie. LIST
 * Address (mandatory): address of the server socket ie. localhost or 192.0.0.127
 * Port (mandatory): port of the address socket ie. 8888
-* Option (optional): optional parameter such as a file name ie. cat.jpg
+* Option (mandatory): optional parameter such as a file name ie. cat.jpg. If not needed, use "." for this element.
 * sp means single space ie. pressing the space bar button once
 * \r\n means carriage return and new line ie. pressing the enter button
 
-### LIST address port
+### LIST address port .
 
 Requests a list of files which are available for downloading from the server. Returns FILE response and the list is in the response's body.
 
@@ -44,15 +44,21 @@ The server closes the connection when the list is sent. The client prints the li
 
 #### Example request
 
-LIST localhost 8888
+LIST localhost 8888 .
 
 #### Example response
 
-FILE OK
-cat.jpg
-dog.png
-snake.mp3
-mouse.flv
+FILE body
+
+The body has data with names of the available files in the server. The body is a string and the items are delimited with "\n". A "FILE OK" message and the file names are printed to the client's CLI.
+
+##### Print to the client's CLI
+
+FILE OK<br/>
+cat.jpg<br/>
+dog.png<br/>
+snake.mp3<br/>
+mouse.flv<br/>
 pig.txt
 
 ### DOWNLOAD address port file-name
@@ -66,6 +72,12 @@ DOWNLOAD localhost 8888 cat.jpg
 
 #### Example response
 
+FILE body
+
+The body has data with the name and the content of the file. The name and the content is delimited with "\n". If the file is a binary file, then the data is in base64 format. A "FILE OK" message if printed to the client's CLI:
+
+##### Print to the client's CLI
+
 FILE OK
 
 ## Responses
@@ -78,14 +90,14 @@ Example: ERROR errorMessage
 
 Syntax:
 * Method (mandatory): name of the method ie. FILE
-* Body (mandatory): method's body/payload ie. cat.jpg or error message ie. "File not found"
+* Body (mandatory): method's body/payload ie. "cat.jpg\ndataInBase64" or error message ie. "File not found"
 * sp means single space ie. pressing the space bar button once
 * \r\n means carriage return and new line ie. pressing the enter button
 
 ### FILE file
 
 Returns requested file or data from the server. The file/data is in the response's body (payload). If the data is in binary format, it will be converted to base64 string.
-If successful, message "FILE OK" will be printed to the CLI.
+If successful, message "FILE OK" will be printed to the CLI and the file is written to the client's storage system.
 
 #### Example request
 
@@ -93,52 +105,82 @@ DOWNLOAD localhost 8888 cat.jpg
 
 #### Example response
 
+FILE file
+
+FILE method's body data (file) consists of a file name (and possible extension) and file data delimited by "\n". For example, "filename.ext\nfiledata".
+
+##### Print to the client's CLI
+
 FILE OK
 
 ### ERROR errorMessage
 
-Returns error message when an error occurred. The cause of error can, for example, be a invalid request ie. unknown method.
+Returns error code when an error occurred. The cause of error can, for example, be a invalid request ie. unknown method.
 
-#### Example request
+#### Example request 1
 
 UPLOAD localhost 8888
 
-#### Example response
+Please note that the UPLOAD method is not supported.
 
-ERROR unknownMethod
+#### Example response 1
+
+ERROR 102
+
+##### Print to the client's CLI
+
+ERROR Unknown Method
+
+#### Example request 2
+
+DOWNLOAD localhost 8888 cat
+
+Please note that a file named "cat" is not available at the server. cat.jpg is available.
+
+#### Example response 2
+
+ERROR 101
+
+##### Print to the client's CLI
+
+ERROR File Not Found
 
 #### Error messages
 
-##### fileNotFound
+Error's status code is returned, not description. The client prints a verbose message depending on the status code.
+
+Error messages below are in the following format: statuscode sp statusname
+
+##### 101 fileNotFound
 
 The server does not have the requested file. For example, the server has cat.jpg, but the client requests dog.jpg.
 
-##### unknownMethod
+##### 102 unknownMethod
 
 The requested method is unknown. See known methods above (LIST etc.).
 
-##### malformedRequest
+##### 103 malformedRequest
 
 The request is malformed. For example, DOWNLOADfile is malformed, single space is required.
 
 ## The client side errors
 
-Some errors can occur without ERROR response. For example, if the client cannot connect to the server, the server cannot response.
+Some errors can occur without ERROR response. For example, if the client cannot connect to the server, the server cannot response. The error is printed to the CLI.
 
 ### Error messages
 
-#### hostNotFound
+#### 201 hostNotFound
 
 The client cannot connect to the server. The address and/or the port is wrong or the server is down.
 
-#### outOfSpace
+#### 202 outOfSpace
 
 Response is received, but the body is too large and it cannot be written to the client's storage system.
 
-#### malformedResponse
+#### 203 malformedResponse
 
 Response is received, but it is malformed. For example, the server crashes and the response is not complete (for example, \r\n is missing).
 
-#### connectionTimedOut
+#### 204 connectionTimedOut
 
 The server is up and running, but the client is suffering problems with her Internet connection and drops the connection to the server.
