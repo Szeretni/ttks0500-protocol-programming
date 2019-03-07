@@ -4,14 +4,14 @@
 
 ## Description
 
-This is a design document for a simple file transfer protocol, which has two requests (LIST, DOWNLOAD) and three responses (ERROR, FILE, OK). It uses sockets to connect differents hosts. The sockets use TCP and IPv4 protocols to transfer data. The protocol stateless. 
+This is a design document for a simple file transfer protocol, which has two requests (LIST, DOWNLOAD) and two responses (ERROR, FILE). It uses sockets to connect differents hosts. The sockets use TCP and IPv4 protocols to transfer data. The protocol stateless. 
 That is, request-response pairs are independent of other pairs. They don't affect each other. The protocol is doesn't have authentication ie. responses don't require username and password from the request. Default port is 8888.
 
 The requests use headers for determining server socket's address and port. Headers are also optionally used for disconnecting the sockets. When a request or a response has a body (payload), a header is used to inform the recipient socket of the size of the body.
 The payload data is just plain text. It's not in, for example, JSON-format. Different lines in the data (\r\n) are used to separate information. For example, each item of a list has it's own row.
 The server closes connection when the request has the disconnect header, the payload is fulle received or an error occurred.
 
-THe protocol is text based ie. the requests and responses are handled as strings instead of bytes. String "\r\n" is used to separate different sections in the requests and responses. The user uses single spaces in the requests to separate different elements.
+The protocol is text based ie. the requests and responses are handled as strings instead of bytes. String "\r\n" is used to separate different sections in the requests and responses. The user uses single spaces in the requests to separate different elements.
 It enables using sockets as files, which useful because file methods can be used to read and write the requests and responses. The user uses an command line interface (CLI) to use this protocol (she uses keyboard).
 
 ## Requests
@@ -29,12 +29,11 @@ Syntax:
 
 ### LIST address port
 
-Requests a list of files which are available for downloading from the server. Returns OK response and the list is in the response's body. 
+Requests a list of files which are available for downloading from the server. Returns FILE response and the list is in the response's body.
 
 #### Additional information
 
-Client socket cannot specify which folder is used on the server. It's fixed for security reasons (makes it easier to restrict which files the client has access to).
-The server closes the connection when the list is sent. The client prints the list to the CLI.
+Client socket cannot specify which folder is used on the server. It's fixed for security reasons (makes it easier to restrict which files the client has access to). The server closes the connection when the list is sent. The client prints the list to the CLI.
 
 #### Example request
 
@@ -42,7 +41,7 @@ LIST localhost 8888
 
 #### Example response
 
-OK
+FILE OK
 cat.jpg
 dog.png
 snake.mp3
@@ -59,56 +58,43 @@ DOWNLOAD localhost 8888 cat.jpg
 
 #### Example response
 
-OK
+FILE OK
 
 ## Responses
 
+Response format: method sp body \r\n
+Example: FILE file
+Example: ERROR errorMessage
 
+Syntax:
+* Method (mandatory): name of the method ie. FILE
+* Body (mandatory): method's body/payload ie. cat.jpg or error message ie. "File not found"
+* sp means single space ie. pressing the spacebar button once
+* \r\n means carriage return and new line ie. pressing the enter button
 
+### FILE file
 
-oletusportti?
-tunnistautuminen?
+Returns requested file or data from the server. The file/data is in the response's body (payload). If the data is in binary format, it will be converted to base64 string. If succesful, message "FILE OK" will be printed to the CLI.
 
-minkä tason protocol, mikä tyyppi (tilaton/tialllinen)
-voiko servu vastata ilman request?
+#### Example request
 
-headers?
+DOWNLOAD localhost 8888 cat.jpg
 
-sallitut metodit
+#### Example response
 
-Request response same structure?
+FILE OK
 
-How does the recipient know it has received the whole message?
+### ERROR errorMessage
 
-Error conditios on the server?
+Returns error message when an error occurres. The cause of error can, for example, be a invalid request ie. unknown method.
 
-Error conditions on the network?
+#### Example request
 
-transfer protocol TCP UDP?
+UPLOAD localhost 8888
 
-conn termination? new message type?
+#### Example response
 
-## Requests
+ERROR unknownMethod
 
-### LIST X Y [BODY]?
-
-description
-example
-
-### DOWNLOAD X Y [BODY]?
-
-description
-example
-
-## Responses
-
-### ERROR X Y [BODY]?
-
-description
-example
-
-### FILE X Y [BODY]?
-
-description
-example
+#### Error messages
 
