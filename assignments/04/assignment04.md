@@ -9,10 +9,8 @@ The sockets use TCP and IPv4 protocols to transfer data. The protocol stateless.
 That is, request-response pairs are independent of other pairs. They don't affect each other.
 The protocol is doesn't have authentication ie. responses don't require username and password from the request. Default port is 8888.
 
-The requests use headers for determining server socket's address and port. Headers are also optionally used for disconnecting the sockets.
-When a request or a response has a body (payload), a header is used to inform the recipient socket of the size of the body.
 The payload data is just plain text. It's not in, for example, JSON-format. Different lines in the data (\r\n) are used to separate information. For example, each item of a list has it's own row.
-The server closes connection when the request has the disconnect header, the payload is fully received or an error occurred.
+The server closes the connection when the payload is fully received or an error occurred.
 
 The protocol is text based ie. the requests and responses are handled as strings instead of bytes. String "\r\n" is used to separate different sections in the requests and responses.
 The user uses single spaces in the requests to separate different elements.
@@ -35,7 +33,7 @@ Syntax:
 
 ### LIST address port .
 
-Requests a list of files which are available for downloading from the server. Returns FILE response and the list is in the response's body.
+Requests a list of files which are available for downloading from the server. Returns FILE response and the list is in the response's body. The option element is not needed in this request, so the fourth argument is ".".
 
 #### Additional information
 
