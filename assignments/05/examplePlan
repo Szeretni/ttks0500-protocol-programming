@@ -1,0 +1,89 @@
+Derpy File Transfer Protocol (DFTP)
+
+DFTP is a simple file transfer protocol. DFTP requires a reliable transport
+such as TCP. Default DFTP port is 1234. DFTP is not encrypted and it does not
+have any authentication or authorization functionality.
+
+DFTP is a stateless request/response protocol. Requests are made by the client
+and responses are made by the server. Responses can only be sent as a response
+to a request. Responses can never be sent without receiving a request first.
+Once a request has been sent and a response has been received the underlying
+TCP connection is closed by the client.
+
+DFTP message structure (for both requests and responses) is as follows:
+
+    METHOD BODYLENGTH METHOD-SPECIFIC-PARAMETERS\r\n
+    [BODY]
+
+The first line of a message consists of a method, body length and method
+specific parameters followed by a CRLF (\r\n). Optional body follows the \r\n
+characters. Whether or not a message contains a body depends on the method.
+
+DFTP has the following methods:
+
+    LIST
+    LISTRESPONSE
+    DOWNLOAD
+    FILE
+    ERROR
+
+LIST is used by the client to request a list of files that can be downloaded
+using the DOWNLOAD method.  LIST has one method parameter, path to the folder
+from which the files are listed.  If the client wants to list the files and
+folders in the default folder DOT (".") is used as the path to the folder.
+Implementations should make sure that LIST cannot return files outside of the
+server's document folder. LIST does not have a body. If a LIST request has a
+non-zero body length the request is malformed and the server SHOULD close the
+underlying TCP connection immediately. Server responds to a valid LIST request
+with a LISTRESPONSE message. If the path to folder parameter is not found on
+the server, an ERROR response with error code 1 is sent back to the client.
+All error codes are listed in the ERROR message spefication. ERROR response
+with error code 1 is also sent if the given parameter is a file instead of a
+folder.
+
+Example LIST request:
+
+    LIST 0 .\r\n
+
+LISTRESPONSE is used by the server to respond to a client's valid LIST request.
+LISTRESPONSE has a single method parameter, number of items in the returned
+list. LISTRESPONSE has a body if the number of returned items is greater than
+0. The body is a list of \r\n separated items. The final item should not have
+the \r\n suffix.
+
+Example LISTRESPONSE response:
+
+    LISTRESPONSE 9 1\r\n
+    nakki.txt
+
+DOWNLOAD is used by the client to request a file's contents. DOWNLOAD has one
+mandatory method parameter that is the path to the file to download. Folders
+cannot be downloaded. If a DOWNLOAD request is made to a folder, the server
+should return with a ERROR response with the error code 2. If a DOWNLOAD request
+is made to a non-existing file the server should return with an ERROR response
+with the error code 3.
+
+Example DOWNLOAD request:
+
+    DOWNLOAD 0 nakki.txt\r\n
+
+FILE is used by the server to send the contents of a FILE to a client.
+FILE has method parameter, the name of the file that is being in the body.
+FILE has a mandatory body that contains the bytes of the file. A single FILE
+response can contain the contents of a single file.
+
+Example FILE response:
+
+    FILE 13 nakki.txt\r\n
+    hello world!\n
+
+ERROR is used by the server to let the client know that a request could not be
+handled. Error has a single method parameter, an error code. ERROR does not
+have a body.
+
+List of error codes and their meaning:
+
+    1: Folder not found or it is a file
+    2: Given parameter is a folder. Folders cannot be downloaded
+    3: File not found
+
