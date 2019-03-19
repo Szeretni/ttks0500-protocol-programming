@@ -5,10 +5,9 @@ sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 
 try:
-    ip = sys.argv[1]
-    port = int(sys.argv[2])
+    (ip,port) = fns.argumentCheck(sys.argv)
 except (IndexError, ValueError):
-    print "Error, please check the arguments. Valid syntax: python server.py <ip> <port>"
+    exit()
 
 try:
     sock.bind((ip,port))

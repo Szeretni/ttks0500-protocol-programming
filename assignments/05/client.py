@@ -1,15 +1,22 @@
 import socket
 import sys
+from functions import Functions as fns
 
 sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
 try:
-    ip = sys.argv[1]
-    port = int(sys.argv[2])
+    (ip,port) = fns.argumentCheck(sys.argv)
 except (IndexError, ValueError):
-    print "Error, please check the arguments. Valid syntax: python client.py <ip> <port>"
+    exit()
 
 try:
     sock.connect((ip,port))
-except (socket.gaierror):
+except (socket.gaierror, socket.error):
     print "Error, please check the ip and port for any mistakes. Otherwise, the server might be down."
+#    exit()
+
+try:
+    fns.writeMessage("mes","mes","mes","mes")
+except NameError as ex:
+    print ex
+    exit()
