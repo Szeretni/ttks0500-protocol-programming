@@ -37,7 +37,23 @@ try:
             print ex
         except AssertionError as ex:
             print ex
-    print sock.recv(1024)
+    response = sock.recv(fns.getBufferSize())
+    print response
+    responseItems = response.split(" ")
+    if responseItems[0] == "FILE":
+        fileNameAndResponseBody = responseItems[2]
+        fileNameAndResponseBody = fileNameAndResponseBody.split("\r\n")
+        fileName = fileNameAndResponseBody[0]
+        print fileName
+        metadataAndBody = response.split("\r\n")
+        metadata = metadataAndBody[0]
+        metadataLen = len(metadata)+len("\r\n")
+        body = response[(metadataLen):]
+        print body
+        file = open(fileName,"wb")
+        file.write(body)
+        file.close()
+
     sock.close()
 except socket.error:
     print "Connection closed."

@@ -30,3 +30,7 @@ class Functions:
     @staticmethod
     def getValidMethods():
         return ["LIST","LISTRESPONSE","DOWNLOAD","FILE","ERROR"]
+
+    @staticmethod
+    def getBufferSize():
+        return 4096
