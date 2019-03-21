@@ -38,7 +38,10 @@ while True:
         bodylenght = int(requestItems[1])
         parameterAndBody = requestItems[2].split("\r\n")
         parameter = parameterAndBody[0]
-#        if parameter # contains ../
+        if(parameter.find('../') != -1):
+            print "Invalid path, don't try to enter parent folders!"
+            client.close()
+            continue
 
         if method == "LIST" and bodylenght != 0:
             print "LIST's body lenght != 0"
@@ -47,10 +50,21 @@ while True:
         elif method == "LIST":
             baseDir = "files"
             if parameter == ".":
-                print os.listdir("files")
+                files = os.listdir("files")
+                body = ""
+                for x in range(0,len(files)):
+                    if x != len(files)-1:
+                        body += files[x] + "\r\n"
+                    else:
+                        body += files[x]
+                response = fns.writeMessage("LISTRESPONSE",len(body),len(files),body)
+                print response
+                client.send(response)
             else:
-                print os.listdir("files/%s" % parameter)
-
+                body = os.listdir(str("files/%s" % parameter))
+                response = fns.writeMessage("LISTRESPONSE",len(body),len(files),body)
+                print response
+                client.send(response)
 
 
         client.close()

@@ -17,8 +17,7 @@ except (socket.gaierror, socket.error):
 
 
 try:
-    requestRaw = raw_input("Make a request: ")
-    requestItems = requestRaw.split(" ")
+    requestItems = sys.argv[3].split(" ")
 
     if len(requestItems) != 3:
         print "The request is missing parts. Example request: LIST 0 ."
@@ -38,6 +37,7 @@ try:
             print ex
         except AssertionError as ex:
             print ex
+    print sock.recv(1024)
     sock.close()
 except socket.error:
     print "Connection closed."
