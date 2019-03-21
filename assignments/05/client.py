@@ -44,15 +44,14 @@ try:
         fileNameAndResponseBody = responseItems[2]
         fileNameAndResponseBody = fileNameAndResponseBody.split("\r\n")
         fileName = fileNameAndResponseBody[0]
-        print fileName
         metadataAndBody = response.split("\r\n")
         metadata = metadataAndBody[0]
         metadataLen = len(metadata)+len("\r\n")
         body = response[(metadataLen):]
-        print body
         file = open(fileName,"wb")
         file.write(body)
         file.close()
+        print fileName,"downloaded."
 
     sock.close()
 except socket.error:

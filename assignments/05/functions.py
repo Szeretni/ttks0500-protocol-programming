@@ -24,8 +24,10 @@ class Functions:
             raise ex
         if parameters is None:
             raise AssertionError("Error, parameter is null.")
-
-        return "%s %s %s\r\n%s" %(method, bodylenght, parameters, body)
+        if body is None:
+            return "%s %s %s\r\n" %(method, bodylenght, parameters)
+        else:
+            return "%s %s %s\r\n%s" %(method, bodylenght, parameters, body)
 
     @staticmethod
     def getValidMethods():
