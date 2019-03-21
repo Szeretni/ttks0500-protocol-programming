@@ -89,10 +89,7 @@ while True:
                 data = file.read(fns.getBufferSize())
                 response = fns.writeMessage("FILE",len(data),fileName,data)
                 client.send(response)
-            except NameError:
-                print "nameerror occurred."
             except IOError as ex:
-                print ex.args[0]
                 if ex.args[0] == 21:
                     print "IOError 21, 'Is a directory'"
                     response = fns.writeMessage("ERROR",0,2,None)
