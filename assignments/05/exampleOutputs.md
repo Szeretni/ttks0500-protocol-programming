@@ -76,6 +76,8 @@ Waiting for a message.
 Received the message succesfully.
 ERROR 0 1
 
+# DOWNLOAD
+
 ### python client.py localhost 1234 "DOWNLOAD 0 folder1"
 
 The client tried to download a folder. Error 2.
