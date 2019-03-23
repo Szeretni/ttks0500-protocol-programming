@@ -1,13 +1,13 @@
 import os
 import socket
 import sys
-from functions import Functions as fns
+from dftp import DFTP
 
 sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 
 try:
-    (ip,port) = fns.argumentCheck(sys.argv)
+    (ip,port) = DFTP.argumentCheck(sys.argv)
 except (IndexError, ValueError):
     exit()
 
@@ -23,21 +23,21 @@ while True:
         print "Waiting for new connections."
         (client,addr) = sock.accept()
         print "A new connection from ",addr
-        requestData = client.recv(fns.getBufferSize())
+        requestData = client.recv(DFTP.getBufferSize())
         request = ""
         while True:
             request += requestData
             if request.find("\r\n") != -1:
                 print "A request received succesfully."
                 break
-            requestData = client.recv(fns.getBufferSize())
+            requestData = client.recv(DFTP.getBufferSize())
         print "The request:\n",request
 
         requestItems = request.split(" ")
 
         if len(requestItems) != 3:
             print "Invaled request: ",request
-            response = fns.writeMessage("ERROR",0,4,None)
+            response = DFTP.writeMessage("ERROR",0,4,None)
             print "Sending a message."
             print response
             sentBytes = 0
@@ -55,7 +55,7 @@ while True:
         parameter = parameterAndBody[0]
         if(parameter.find('../') != -1):
             print "Invalid path, don't try to enter parent folders!"
-            response = fns.writeMessage("ERROR",0,4,None)
+            response = DFTP.writeMessage("ERROR",0,4,None)
             print "Sending a message."
             print response
             sentBytes = 0
@@ -69,7 +69,7 @@ while True:
 
         if bodylenght != 0:
             print "Request's body lenght is non-zero. Terminating."
-            response = fns.writeMessage("ERROR",0,4,None)
+            response = DFTP.writeMessage("ERROR",0,4,None)
             print "Sending a message."
             print response
             sentBytes = 0
@@ -91,7 +91,7 @@ while True:
                         body += files[x] + "\r\n"
                     else:
                         body += files[x]
-                response = fns.writeMessage("LISTRESPONSE",len(body),len(files),body)
+                response = DFTP.writeMessage("LISTRESPONSE",len(body),len(files),body)
                 print "Sending a message."
                 print response
                 sentBytes = 0
@@ -109,7 +109,7 @@ while True:
                             body += files[x] + "\r\n"
                         else:
                             body += files[x]
-                    response = fns.writeMessage("LISTRESPONSE",len(body),len(files),body)
+                    response = DFTP.writeMessage("LISTRESPONSE",len(body),len(files),body)
                     print "Sending a message."
                     print response
                     sentBytes = 0
@@ -119,7 +119,7 @@ while True:
                             print "The message sent succesfully."
                             break
                 except OSError:
-                    response = fns.writeMessage("ERROR",0,1,None)
+                    response = DFTP.writeMessage("ERROR",0,1,None)
                     print "Sending a message."
                     print response
                     sentBytes = 0
@@ -138,7 +138,7 @@ while True:
                 folderAndfile = folder + fileName
                 file = open(folderAndfile)
                 data = file.read()
-                response = fns.writeMessage("FILE",len(data),fileName,data)
+                response = DFTP.writeMessage("FILE",len(data),fileName,data)
                 print "Sending a message."
                 sentBytes = 0
                 while True:
@@ -149,7 +149,7 @@ while True:
             except IOError as ex:
                 if ex.args[0] == 21:
                     print "IOError 21, 'Is a directory'"
-                    response = fns.writeMessage("ERROR",0,2,None)
+                    response = DFTP.writeMessage("ERROR",0,2,None)
                     print "Sending a message."
                     print response
                     sentBytes = 0
@@ -160,7 +160,7 @@ while True:
                             break
                 elif ex.args[0] == 2:
                     print "IOError 2, 'No such file or directory'"
-                    response = fns.writeMessage("ERROR",0,3,None)
+                    response = DFTP.writeMessage("ERROR",0,3,None)
                     print "Sending a message."
                     print response
                     sentBytes = 0
@@ -170,6 +170,7 @@ while True:
                             print "The message sent succesfully."
                             break
         client.close()
+        print "Connection closed to",addr,"\n"
     except KeyboardInterrupt:
         print "\nGood bye."
         client.close()
