@@ -23,14 +23,29 @@ while True:
         print "Waiting for new connections."
         (client,addr) = sock.accept()
         print "A new connection from ",addr
-        request = client.recv(fns.getBufferSize())
-        print "A request:\n",request
+        requestData = client.recv(fns.getBufferSize())
+        request = ""
+        while True:
+            request += requestData
+            if request.find("\r\n") != -1:
+                print "A request received succesfully."
+                break
+            requestData = client.recv(fns.getBufferSize())
+        print "The request:\n",request
 
-        request = request
         requestItems = request.split(" ")
 
         if len(requestItems) != 3:
             print "Invaled request: ",request
+            response = fns.writeMessage("ERROR",0,4,None)
+            print "Sending a message."
+            print response
+            sentBytes = 0
+            while True:
+                sentBytes += client.send(response[sentBytes:])
+                if sentBytes == len(response):
+                    print "The message sent succesfully."
+                    break
             client.close()
             continue
 
@@ -40,11 +55,29 @@ while True:
         parameter = parameterAndBody[0]
         if(parameter.find('../') != -1):
             print "Invalid path, don't try to enter parent folders!"
+            response = fns.writeMessage("ERROR",0,4,None)
+            print "Sending a message."
+            print response
+            sentBytes = 0
+            while True:
+                sentBytes += client.send(response[sentBytes:])
+                if sentBytes == len(response):
+                    print "The message sent succesfully."
+                    break
             client.close()
             continue
 
         if bodylenght != 0:
             print "Request's body lenght is non-zero. Terminating."
+            response = fns.writeMessage("ERROR",0,4,None)
+            print "Sending a message."
+            print response
+            sentBytes = 0
+            while True:
+                sentBytes += client.send(response[sentBytes:])
+                if sentBytes == len(response):
+                    print "The message sent succesfully."
+                    break
             client.close()
             continue
 
@@ -59,8 +92,14 @@ while True:
                     else:
                         body += files[x]
                 response = fns.writeMessage("LISTRESPONSE",len(body),len(files),body)
+                print "Sending a message."
                 print response
-                client.send(response)
+                sentBytes = 0
+                while True:
+                    sentBytes += client.send(response[sentBytes:])
+                    if sentBytes == len(response):
+                        print "The message sent succesfully."
+                        break
             else:
                 try:
                     files = os.listdir(str("files/%s" % parameter))
@@ -71,12 +110,24 @@ while True:
                         else:
                             body += files[x]
                     response = fns.writeMessage("LISTRESPONSE",len(body),len(files),body)
+                    print "Sending a message."
                     print response
-                    client.send(response)
+                    sentBytes = 0
+                    while True:
+                        sentBytes += client.send(response[sentBytes:])
+                        if sentBytes == len(response):
+                            print "The message sent succesfully."
+                            break
                 except OSError:
                     response = fns.writeMessage("ERROR",0,1,None)
+                    print "Sending a message."
                     print response
-                    client.send(response)
+                    sentBytes = 0
+                    while True:
+                        sentBytes += client.send(response[sentBytes:])
+                        if sentBytes == len(response):
+                            print "The message sent succesfully."
+                            break
         elif method == "DOWNLOAD":
             parameterItems = parameter.split("/")
             numOfItems = len(parameterItems)
@@ -86,19 +137,38 @@ while True:
                 folder = "files/%s" % path
                 folderAndfile = folder + fileName
                 file = open(folderAndfile)
-                data = file.read(fns.getBufferSize())
+                data = file.read()
                 response = fns.writeMessage("FILE",len(data),fileName,data)
-                client.send(response)
+                print "Sending a message."
+                sentBytes = 0
+                while True:
+                    sentBytes += client.send(response[sentBytes:])
+                    if sentBytes == len(response):
+                        print "The message sent succesfully."
+                        break
             except IOError as ex:
                 if ex.args[0] == 21:
                     print "IOError 21, 'Is a directory'"
                     response = fns.writeMessage("ERROR",0,2,None)
-                    client.send(response)
+                    print "Sending a message."
+                    print response
+                    sentBytes = 0
+                    while True:
+                        sentBytes += client.send(response[sentBytes:])
+                        if sentBytes == len(response):
+                            print "The message sent succesfully."
+                            break
                 elif ex.args[0] == 2:
                     print "IOError 2, 'No such file or directory'"
                     response = fns.writeMessage("ERROR",0,3,None)
-                    client.send(response)
-
+                    print "Sending a message."
+                    print response
+                    sentBytes = 0
+                    while True:
+                        sentBytes += client.send(response[sentBytes:])
+                        if sentBytes == len(response):
+                            print "The message sent succesfully."
+                            break
         client.close()
     except KeyboardInterrupt:
         print "\nGood bye."
