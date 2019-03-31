@@ -20,13 +20,51 @@ method sp parameter\r\n
 ```
 
 Items:
-* method: ADD, LIST, DONE, OK, ERROR
+* method: LIST, ADD, DONE, OK, ERROR
 * sp: single space, that is, pressing the spacebar once
 * parameter (optional in some messages): a message which an user wants to store to the todo list. Or additional information for a response
+  * if parameter is not needed, that must be denoted with '.'
 * \r\n: carriage return and new line, that is, pressing the enter once.
 
 An user makes requests with a command line interface by running a client file with an ip address, a port, a method name and a possible parameter. For example:
 
 ```
-python client.py localhost 8888 ADD "Buy vegetables"
+python client.py localhost 8888 "ADD Buy vegetables"
 ```
+
+## Requests
+
+An user makes requests to a server which sends responses back to the user. The server responses with OK or ERROR messages.
+The responses may contain additional information such as the todo file's content or an error code.
+
+### LIST
+
+The user requests a todo file's contents from the server.
+
+#### Example request
+
+LIST .
+
+#### Example response
+```
+OK 200
+1) Buy milk
+2) Pay rent
+3) Feed the dog
+```
+
+### ADD
+
+The user request the server to add an item to the todo file.
+
+#### Example request
+
+ADD Buy vegetables
+
+#### Example response
+```
+OK 200
+```
+
+### DONE
+
