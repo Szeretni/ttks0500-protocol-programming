@@ -42,12 +42,13 @@ The responses may contain additional information such as the todo file's content
 The user requests a todo file's contents from the server.
 
 #### Example request
-
+```
 LIST .
+```
 
 #### Example response
 ```
-OK 200
+OK
 1) Buy milk
 2) Pay rent
 3) Feed the dog
@@ -55,16 +56,40 @@ OK 200
 
 ### ADD
 
-The user request the server to add an item to the todo file.
+The user requests the server to add an item to the todo file.
 
 #### Example request
-
+```
 ADD Buy vegetables
+```
 
 #### Example response
 ```
-OK 200
+OK
 ```
 
 ### DONE
 
+When the user has done a particular task in the todo list, she requests the server to remove a particular todo item from the list. A tasks number is the parameter of the request.
+
+#### Example request
+```
+DONE 1
+```
+
+#### Example response
+```
+OK
+```
+
+## Responses
+
+The server responds to the users requests with response messages.
+
+### OK
+
+This response is sent to the client when to request was processed without complications. May have a parameter (when responding to LIST requests, the parameter has the todo items).
+
+### ERROR
+
+This response is sent to the client when to request couldn't be processed. For example, DONE response's parameter couldn't be found.
