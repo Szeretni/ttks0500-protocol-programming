@@ -1,10 +1,26 @@
-An example specification "Derpy File Transfer Protocol (DFTP)" given by our teacher is implemented completely.
+# TODO Protocol
 
-["Files"](./05/files/) folder has some files to play around with and [exampleOutputs.md](./05/exampleOutputs.md) has examples of every 
-requirement in the spec.
+The server maintains a todo file with todo items.
+The server's client handling is multithreaded so multiple clients are allowed.
+When the threads are accessing the todo file for read/write purposes, the file is locked in order to avoid a data race.
 
-Example usage of the client: python client.py localhost 1234 "LIST 0 ."
+Multithreaded server is important because the server is not blocked while a single client connection is handled.
+Implementing mutual exclusion to the todo file is important because the client threads cannot write to it simultaneously.
+The reading of the todo file also requires a lock in order to avoid dirty reads should a client thread modify the file at the same time.
 
-Example usage of the server: python server.py localhost 1234
+Logging is used to prove that the mutex works as intended.
+See [debug log](debug.log) for logging information about how the threads manages the lock.
+For example, thread 2 acquires the lock and thread 3 is trying to get it.
+Thread 3 has to wait until thread 2 is done with the lock.
+
+[Specification of the protocol](spec.md) is available. The spec is based on the assignment 4's spec.
+
+Different example [request-response outputs](outputs.md) are available.
+
+## Example usage
+
+Example usage of the client: python client.py localhost 8888 "LIST 0 ."
+
+Example usage of the server: python server.py localhost 8888
 
 Author: [Hannu Oksman](https://student.labranet.jamk.fi/~L2912/)
