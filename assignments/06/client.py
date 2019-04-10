@@ -1,6 +1,6 @@
 import socket
 import sys
-from dftp import DFTP
+from todo import TODO
 
 # Example usage of the client: python client.py localhost 1234 "LIST 0 ."
 
@@ -10,7 +10,7 @@ sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 # Preliminary value checks for values which were provided by the user.
 try:
     # Get ip and port from the values.
-    (ip,port) = DFTP.argumentCheck(sys.argv)
+    (ip,port) = TODO.argumentCheck(sys.argv)
 except (IndexError, ValueError):
     exit()
 
@@ -18,8 +18,7 @@ except (IndexError, ValueError):
 try:
     # Get method, bodylength, parameter and body (Client requests in this spec does not have a body).
     userInput = sys.argv[3].strip().split(" ")
-    method,bodylength,parameter,body = DFTP.validateInput(userInput)
-    print "parameter",parameter
+    method,bodylength,parameter,body = TODO.validateInput(userInput)
 
     # Connecting to the server.
     try:
@@ -29,11 +28,10 @@ try:
         exit()
 
     # Write and send a request to the server. Get the response's "header" (METHOD BODYLENGTH PARAMETER) and a possible body.
-    message = DFTP.writeMessage(method,bodylength,parameter,body)
-    print "message",message
-    DFTP.sendMessage(message,sock)
-    headeritems = DFTP.receiveHeader(sock)
-    DFTP.receiveBody(sock,headeritems)
+    message = TODO.writeMessage(method,bodylength,parameter,body)
+    TODO.sendMessage(message,sock)
+    headeritems = TODO.receiveHeader(sock)
+    TODO.receiveBody(sock,headeritems)
 except socket.error:
     print "Connection closed."
 except ValueError as ex:
