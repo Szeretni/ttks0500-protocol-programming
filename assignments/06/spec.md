@@ -1,7 +1,7 @@
-# Assignment 06 : TODO Protocol
+# Assignment 06: TODO Protocol
 
 This specification is based on [assignment 04's spec](https://github.com/Szeretni/ttks0500-protocol-programming/blob/master/assignments/04/assignment04.md).
-A server maintains a file with todo items, such as "buy vegetables", in it's file system.
+A server maintains a file with todo items, such as "buy vegetables", in its file system.
 A client can make requests (ADD, LIST, DONE) to the server in order to manipulate the todo file.
 The server is multithreaded and can handle concurrently multiple clients.
 The todo file is locked when one thread is accessing it and unlocked when it's done.
@@ -18,20 +18,20 @@ The server cannot initiate communication with the clients.
 The message structure is very simple. For example:
 
 ```
-METHOD sp BODYLENGHT sp METHOD-SPECIFIC-PARAMETER\r\n
+METHOD sp BODYLENGTH sp METHOD-SPECIFIC-PARAMETER\r\n
 [BODY]
 ```
 
 Items:
 * METHOD: LIST, ADD, DONE, OK, ERROR
 * sp: single space, that is, pressing the spacebar once
-* BODYLENGHT: bytes in the body/payload
-* METHOD-SPECIFIC-PARAMETER: a message which an user wants to store to the todo list. Or additional information for a response
+* BODYLENGTH: bytes in the body/payload
+* METHOD-SPECIFIC-PARAMETER: a message which a user wants to store to the todo list. Or additional information for a response
   * if a parameter is not needed, it must be denoted with '.'
 * \r\n: carriage return and new line, that is, pressing the enter once
 * BODY: additional data such as items of the todo list
 
-An user makes requests with a command line interface by running a client file with an ip address, a port, a method name and a possible parameter. For example:
+A user makes requests with a command line interface by running a client file with an IP address, a port, a method name, and a possible parameter. For example:
 
 ```
 python client.py localhost 8888 "ADD 0 Buy vegetables"
@@ -39,7 +39,7 @@ python client.py localhost 8888 "ADD 0 Buy vegetables"
 
 ## Requests
 
-An user makes requests to a server which sends responses back to the user.
+A user makes requests to a server which sends responses back to the user.
 The server responses with LISTRESPONSE, OK or ERROR messages.
 The responses may contain additional information such as the todo file's content or an error code.
 
@@ -76,7 +76,7 @@ OK
 
 ### DONE
 
-When the user has done a particular task in the todo list, she requests the server to remove a particular todo item from the list. A task's number is the parameter of the request.
+When the user has done a particular task in the to-do list, she requests the server to remove a particular to-do item from the list. A task's number is the parameter of the request.
 
 #### Example request
 ```
@@ -90,16 +90,16 @@ OK
 
 ## Responses
 
-The server responds to the users requests with response messages.
+The server responds to the users' requests with response messages.
 
 ### OK 1
 
-Succesfully added a new item to todo file.
+Successfully added a new item to todo file.
 
 
 ### OK 2
 
-Succesfully removed a done task from the todo file.
+Successfully removed a done task from the todo file.
 
 ### ERROR 1
 
@@ -111,8 +111,8 @@ LIST request's parameter was not ".".
 
 ### ERROR 3
 
-Tried unsuccesfully to add a new item to the todo file.
+Tried unsuccessfully to add a new item to the todo file.
 
 ### ERROR 4
 
-Tried unsuccesfully to remove a done task from the todo file.
+Tried unsuccessfully to remove a done task from the todo file.
