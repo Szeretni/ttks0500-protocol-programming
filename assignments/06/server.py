@@ -1,6 +1,8 @@
+import logging
 import socket
 import sys
 import threading
+import time
 from dftp import DFTP
 
 # Example usage of the server: python server.py localhost 1234
@@ -24,14 +26,14 @@ except (socket.gaierror):
 # Listening for requests.
 sock.listen(5)
 
-#Main functionality.
-while True:
-    try:
-        # Establishing a connection.
-        print "Waiting for new connections."
-        (client,addr) = sock.accept()
-        print "A new connection from ",addr
+# Lock is used to mutual exclusion when todo.txt is accessed for read/write ops
+lock = threading.Lock()
 
+# Client thread (main loop is last in this file)
+# Logging to a file to prove that mutex works
+logging.basicConfig(filename="debug.log",level=logging.DEBUG,format="(%(asctime)s  %(threadName)s %(message)s)")
+def clientThread(client,addr):
+    try:
         # Getting the request's "header" (METHOD BODYLENGTH PARAMETER).
         requestItems = DFTP.receiveHeader(client)
 
@@ -45,7 +47,6 @@ while True:
             response = DFTP.writeMessage("ERROR",0,4,None)
             DFTP.sendMessage(response,client)
             client.close()
-            continue
 
         response = ""
         # LIST response.
@@ -67,10 +68,14 @@ while True:
                 print response
         # ADD response.
         elif method == "ADD":
+            logging.debug("trying to acquire the lock")
+            lock.acquire()
+            logging.debug("lock acquired for adding todo item")
+            time.sleep(5)
             try:
                 DFTP.writeTodo(parameter)
-#                response = DFTP.writeMessage("FILE",len(data),filename,data)
-#                print "FILE",len(data),filename
+    #                response = DFTP.writeMessage("FILE",len(data),filename,data)
+    #                print "FILE",len(data),filename
                 response = DFTP.writeMessage("OK",0,0,None)
                 print "OK"
             except IOError as ex:
@@ -82,12 +87,19 @@ while True:
                 elif ex.args[0] == 2:
                     print "IOError 2, 'No such file or directory'"
                     response = DFTP.writeMessage("ERROR",0,3,None)
+            finally:
+                lock.release()
+                logging.debug("lock released")
         elif method == "DONE":
+            logging.debug("trying to acquire the lock")
+            lock.acquire()
+            logging.debug("lock acquired for removing todo item")
+            time.sleep(5)
             print "done"
             try:
                 DFTP.doneTodo(parameter)
-#                response = DFTP.writeMessage("FILE",len(data),filename,data)
-#                print "FILE",len(data),filename
+    #                response = DFTP.writeMessage("FILE",len(data),filename,data)
+    #                print "FILE",len(data),filename
                 response = DFTP.writeMessage("OK",0,0,None)
                 print "OK"
             except IOError as ex:
@@ -99,6 +111,9 @@ while True:
                 elif ex.args[0] == 2:
                     print "IOError 2, 'No such file or directory'"
                     response = DFTP.writeMessage("ERROR",0,3,None)
+            finally:
+                lock.release()
+                logging.debug("lock released")
         # Sending the response to the client.
         DFTP.sendMessage(response,client)
         client.close()
@@ -106,5 +121,20 @@ while True:
     except KeyboardInterrupt:
         print "\nGood bye."
         client.close()
-        sock.close()
+
+#Main functionality.
+while True:
+    try:
+        # Establishing a connection.
+        print "Waiting for new connections."
+        (client,addr) = sock.accept()
+        print "A new connection from ",addr
+
+        thread = threading.Thread(target=clientThread,args=(client,addr))
+        thread.start()
+    except KeyboardInterrupt:
+        print "\nGood bye."
+        client.close()
         break
+
+sock.close()
