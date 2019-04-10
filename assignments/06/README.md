@@ -7,6 +7,8 @@ When the threads are accessing the todo file for read/write purposes, the file i
 Multithreaded server is important because the server is not blocked while a single client connection is handled.
 Implementing mutual exclusion to the todo file is important because the client threads cannot write to it simultaneously.
 The reading of the todo file also requires a lock in order to avoid dirty reads should a client thread modify the file at the same time.
+When a thread acquires the lock then the thread sleeps for 5 seconds.
+This way it can be easily proved that other threads are blocked until the lock is released.
 
 Logging is used to prove that the mutex works as intended.
 See [debug log](debug.log) for logging information about how the threads manages the lock.
